@@ -1,0 +1,366 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
+public class ImageProcessor {
+
+    public static void main(String[] args) {
+        // Load the image files
+        BufferedImage[] images = new BufferedImage[10];
+        images[0] = loadImage("digit_N0.png");
+        images[1] = loadImage("digit_N1.png");
+        images[2] = loadImage("digit_N2.png");
+        images[3] = loadImage("digit_N3.png");
+        images[4] = loadImage("digit_N4.png");
+        images[5] = loadImage("digit_N5.png");
+        images[6] = loadImage("digit_N6.png");
+        images[7] = loadImage("digit_N7.png");
+        images[8] = loadImage("digit_N8.png");
+        images[9] = loadImage("digit_N9.png");
+
+        // Convert the images to pixel data sets
+        int[][][] pixelData = new int[10][][];
+        for (int i = 0; i < images.length; i++) {
+            pixelData[i] = convertToPixelData(images[i]);
+        }
+        
+        // Edge trimming
+        TrimEdge[] trimmedEdgeInstance = new TrimEdge[10];
+        int[][][] trim = new int[10][][];
+        for (int i = 0; i < pixelData.length; i++) {
+        	trimmedEdgeInstance[i] = new TrimEdge(pixelData[i]);
+        	trim[i] = trimmedEdgeInstance[i].getTrimmedEdge();		// Process each image using the TimeEdge class
+        }
+        
+        // Get metrics for each picture. 8 values for each quadrant for each picture
+        DoubleQuadrantPattern[] quadrantPatternInstance = new DoubleQuadrantPattern[10];
+        int[][] quad = new int[10][];
+        for (int i = 0; i < pixelData.length; i++) {
+        	quadrantPatternInstance[i] = new DoubleQuadrantPattern(trim[i], trim[i].length, trim[i][0].length);
+        	quad[i] = quadrantPatternInstance[i].getDataSetTransitions();		// Process each image using the TimeEdge class
+        }
+        
+        // Get 16 pixel density for each picture
+        PixelDensity[] pixelDensityInstance = new PixelDensity[10];
+        double[][] densities = new double[10][];
+        for (int i = 0; i < pixelData.length; i++) {
+        	pixelDensityInstance[i] = new PixelDensity(trim[i], trim[i].length, trim[i][0].length);
+        	densities[i] = pixelDensityInstance[i].getDensityData();		// Process each image using the TimeEdge class
+        }
+        
+        // Get 16 boundary edge detections for each picture
+        BoundaryEdge[] boundaryInstances = new BoundaryEdge[10];
+        double[][] bounds = new double[10][];
+        for (int i = 0; i < pixelData.length; i++) {
+        	boundaryInstances[i] = new BoundaryEdge(trim[i], trim[i].length, trim[i][0].length);
+        	bounds[i] = boundaryInstances[i].getBoundaryArray();
+        }
+        
+        // Get 6 ThirdQuadrantPattern detections for each picture
+        ThirdQuadrantPattern[] thirdQuadrantInstances = new ThirdQuadrantPattern[10];
+        int[][] triples = new int[10][];
+        for (int i = 0; i < pixelData.length; i++) {
+        	thirdQuadrantInstances[i] = new ThirdQuadrantPattern(trim[i], trim[i].length, trim[i][0].length);
+        	triples[i] = thirdQuadrantInstances[i].getDataSetTransitions();
+        }
+        
+        //System.out.println(quad[3][4]);
+        //System.out.println(densities[9][15]);
+        //System.out.println("=================");
+        
+        
+      //---------------------------------------------------------------------------------------------
+        
+        //loading up test subject image
+        BufferedImage imagex = loadImage("9.png");
+        int[][] data = convertToPixelData(imagex);
+        TrimEdge trimtest = new TrimEdge(data);
+        int [][] trimx = trimtest.getTrimmedEdge();
+        
+        //All test processes for test subject
+        DoubleQuadrantPattern quadx = new DoubleQuadrantPattern(trimx, trimx.length, trimx[0].length);  	//get quad values for test subject
+        PixelDensity densityx = new PixelDensity(trimx, trimx.length, trimx[0].length);						//get density values for test subject
+        BoundaryEdge boundx = new BoundaryEdge(trimx, trimx.length, trimx[0].length);						//get boundary values for test subject
+        ThirdQuadrantPattern triplex = new ThirdQuadrantPattern(trimx, trimx.length, trimx[0].length);	//get thirdQuad values for test subject
+        
+	        //trimtest.printEdgeArray();				 	// print the test digit in subject
+	        //trimmedEdgeInstance[7].printEdgeArray();    // print one of the database digit for comparison
+	        //quadx.printQuadrantArray();					// printing quad test values (8) of test subject
+	        //quadrantPatternInstance[7].printQuadrantArray();	//printing quad data (8) values of [x] to compare with test
+        
+        //calculating and printing the difference from database for each quadrant going horizontal and vertical
+        double test1Total = 0;
+        int[][] test1 = new int[10][9];
+        for(int i = 0; i < 10; i++) {
+        	for(int j = 0; j < 8; j++) {
+        		test1[i][j] = Math.abs(quadx.getDataSetTransitions()[j] - quad[i][j]);
+        		test1[i][8] += test1[i][j]; //summing up total for display
+        	}
+        	test1Total += test1[i][8]; //summing up all the individual sums
+        }
+        //display test1 metrics
+        for(int i = 0; i < 10; i++) {
+        	System.out.print(i + " = ");
+        	for(int j = 0; j < 9; j++) {
+        		System.out.print(test1[i][j] + "    ");
+        	}
+        	System.out.println();
+        }System.out.println();
+        
+        
+        //calculating and printing the difference from database for each pixel density
+        double test2Total = 0;
+        double[][] test2 = new double[10][17];
+        for(int i = 0; i < 10; i++) {
+        	for(int j = 0; j < 16; j++) {
+        		test2[i][j] = Math.abs(densityx.getDensityData()[j] - densities[i][j]);
+        		test2[i][16] += test2[i][j]; //summing up total for display
+        	}
+        	test2Total += test2[i][16]; //summing up all the individual sums
+        }
+        //display test2 metrics
+        for (int i = 0; i < 10; i++) {
+        	System.out.print(i + " = ");
+            for (int j = 0; j < 17; j++) {
+                System.out.printf("%.2f    ", test2[i][j]);
+            }
+            System.out.println();
+        }System.out.println();
+        
+        
+        //calculating and printing the difference from database for each boundary values
+        double test3Total = 0;
+        double[][] test3 = new double[10][17];
+        for(int i = 0; i < 10; i++) {
+        	for(int j = 0; j < 16; j++) {
+        		test3[i][j] = Math.abs(boundx.getBoundaryArray()[j] - bounds[i][j]);
+        		test3[i][16] += test3[i][j]; //summing up total for display
+        	}
+        	test3Total += test3[i][16]; //summing up all the individual sums
+        }
+        //display test3 metrics
+        for (int i = 0; i < 10; i++) {
+        	System.out.print(i + " = ");
+            for (int j = 0; j < 17; j++) {
+                System.out.printf("%.2f    ", test3[i][j]);
+            }
+            System.out.println();
+        }System.out.println();
+        
+        
+        //calculating and printing the difference from database for each boundary values
+        double test4Total = 0;
+        double[][] test4 = new double[10][7];
+        for(int i = 0; i < 10; i++) {
+        	for(int j = 0; j < 6; j++) {
+        		test4[i][j] = Math.abs(triplex.getDataSetTransitions()[j] - triples[i][j]);
+        		test4[i][6] += test4[i][j]; //summing up total for display
+        	}
+        	test4Total += test4[i][6]; //summing up all the individual sums
+        }
+        //display test4 metrics
+        for (int i = 0; i < 10; i++) {
+        	System.out.print(i + " = ");
+            for (int j = 0; j < 7; j++) {
+                System.out.printf("%.2f    ", test4[i][j]);
+            }
+            System.out.println();
+        }System.out.println();
+        
+        
+        
+        
+        //display total for all tests above
+        for (int i = 0; i < 10; i++) {
+            System.out.printf("all test total for '%d' = %.2f    \n", i, (test1[i][8] + test2[i][16] + test3[i][16] + test4[i][6]));
+        }System.out.println();
+        
+        
+        
+        
+        //this is just to get a weighted factor for the both test
+        System.out.println("test1 total: " + test1Total);
+        System.out.println("test2 total: " + test2Total);
+        System.out.println("test2 total: " + test3Total);
+        System.out.println("test3 total: " + test4Total + "\n");
+        
+        
+        
+        
+        
+        
+        //==========================Displaying weighted test metrics===============================//
+        
+        //weighted quadrant
+        for (int i = 0; i < 10; i++) {
+        	System.out.printf("weighted quadrant for '%d' = %.2f    \n", i, test1[i][8] / test1Total);
+        }System.out.println();
+        
+        //weighted density
+        for (int i = 0; i < 10; i++) {
+            System.out.printf("weighted density for '%d' = %.2f    \n", i, test2[i][16] / test2Total);
+        }System.out.println();
+        
+        //weighted boundary
+        for (int i = 0; i < 10; i++) {
+        	System.out.printf("weighted boundary for '%d' = %.2f    \n", i, test3[i][16]  / test3Total);
+        }System.out.println();
+        
+        //weighted triples
+        for (int i = 0; i < 10; i++) {
+        	System.out.printf("weighted triples for '%d' = %.2f    \n", i, test4[i][6]  / test4Total);
+        }System.out.println();
+        
+        //weighted total
+        for (int i = 0; i < 10; i++) {
+            System.out.printf("weighted total for '%d' = %.2f    \n", i, (test1[i][8]  / test1Total) + (test2[i][16] / test2Total) + (test3[i][16] / test3Total) + (test4[i][6] / test4Total));
+        }System.out.println();
+        
+        //=========================================================================================//
+        
+        
+        
+        // Find the lowest index for quad
+        int minIndex1 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test1[i][8] < test1[minIndex1][8]) {
+                minIndex1 = i;
+            }
+        }
+        
+        // Find the lowest index for density
+        int minIndex2 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test2[i][16] < test2[minIndex2][16]) {
+                minIndex2 = i;
+            }
+        }
+        
+        // Find the lowest index for boundary
+        int minIndex3 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test3[i][16] < test3[minIndex3][16]) {
+                minIndex3 = i;
+            }
+        }
+        
+        // Find the lowest index for triples
+        int minIndex9 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test4[i][6] < test4[minIndex9][6]) {
+                minIndex9 = i;
+            }
+        }
+        
+        // Find the lowest index for total
+        int minIndex4 = 0;
+        for (int i = 1; i < 10; i++) {
+            if ((test1[i][8] + test2[i][16] + test3[i][16]) < (test1[minIndex4][8] + test2[minIndex4][16] + test3[minIndex4][16])){
+                minIndex4 = i;
+            }
+        }
+        
+        // Find the lowest index for WEIGHTED quad
+        int minIndex5 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test1[i][8] / test1Total < test1[minIndex5][8] / test1Total) {
+                minIndex5 = i;
+            }
+        }
+
+        // Find the lowest index for WEIGHTED density
+        int minIndex6 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test2[i][16] / test2Total < test2[minIndex6][16] / test2Total) {
+                minIndex6 = i;
+            }
+        }
+        
+        // Find the lowest index for WEIGHTED boundary
+        int minIndex7 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test3[i][16] / test3Total < test3[minIndex7][16] / test3Total) {
+                minIndex7 = i;
+            }
+        }
+        
+        // Find the lowest index for WEIGHTED boundary
+        int minIndex10 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (test4[i][6] / test4Total < test4[minIndex10][6] / test4Total) {
+                minIndex10 = i;
+            }
+        }
+        
+        // Find the lowest weighted total index
+        int minIndex8 = 0;
+        for (int i = 1; i < 10; i++) {
+            if (((test1[i][8] / test1Total) + (test2[i][16] / test2Total) + (test3[i][16] / test3Total) + (test4[i][6] / test4Total)) < ((test1[minIndex8][8] / test1Total) + (test2[minIndex8][16] / test2Total) + (test3[minIndex8][16] / test3Total) + (test4[minIndex10][6] / test4Total))){
+                minIndex8 = i;
+            }
+        }
+        // Print the lowest for the tests above recognized digit
+        System.out.println("Recognized digit for quad test: " + minIndex1);
+        System.out.println("Recognized digit for density test: " + minIndex2);
+        System.out.println("Recognized digit for boundary test: " + minIndex3);
+        System.out.println("Recognized digit for triples test: " + minIndex9);
+        System.out.println("Recognized digit for total test: " + minIndex4);
+        System.out.println("Recognized digit for WEIGHTED quad test: " + minIndex5);
+        System.out.println("Recognized digit for WEIGHTED density test: " + minIndex6);
+        System.out.println("Recognized digit for WEIGHTED boundary test: " + minIndex7);
+        System.out.println("Recognized digit for WEIGHTED triples test: " + minIndex10);
+        System.out.println("Recognized digit for WEIGHTED total test: " + minIndex8 + "\n");
+        
+        
+        triplex.printThirdQuadrantArray();
+        thirdQuadrantInstances[0].printThirdQuadrantArray();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      //---------------------------------------------------------------------------------------------
+
+
+    }
+
+    // Method to load an image from file
+    private static BufferedImage loadImage(String filePath) {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    // Method to convert an image to a 2D array of pixel data sets
+    private static int[][] convertToPixelData(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int[][] pixelData = new int[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // Get the RGB value of the pixel at (x, y)
+                int rgb = image.getRGB(x, y);
+                // Convert RGB to grayscale
+                int gray = (rgb >> 16) & 0xFF; // Red channel
+                pixelData[y][x] = gray;
+            }
+        }
+
+        return pixelData;
+    }
+}

@@ -1,0 +1,11 @@
+# Ignore IDE and build files
+*.class
+*.log
+*.iml
+.idea/
+target/
+bin/
+*.DS_Store
+
+# Ignore output result
+result.txt
