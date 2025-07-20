@@ -59,12 +59,25 @@ public class DigitRecognizerUI extends JFrame {
         
         //***********chat gpt help for gui response***********************
         try (BufferedReader reader = new BufferedReader(new FileReader("result.txt"))) {
-            String line, full = "";
-            while ((line = reader.readLine()) != null) full += line + "<br>";
-            resultLabel.setText("<html>" + full + "</html>");
+            String line;
+            String prediction = null;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("ULTIMATE RESULT =")) {
+                    prediction = line.replace("ULTIMATE RESULT =", "").trim();
+                    break;
+                }
+            }
+
+            if (prediction != null) {
+            	resultLabel.setText("<html><div style='font-size:24px; font-weight:bold;'>Prediction: " + prediction + "</div></html>");
+            } else {
+                resultLabel.setText("Prediction could not be read.");
+            }
         } catch (Exception ex) {
             resultLabel.setText("Couldn't load result.");
         }
+
         //*************chat gpt help **************************************
     }
 
