@@ -1,33 +1,21 @@
-# Java Handwritten Digit Recognizer (No Libraries)
+# How to Run:
 
-This project allows a user to draw a digit using a mouse and uses a custom AI recognition system to identify it — built completely from scratch using core Java (no ML libraries, no neural nets).
+Option 1: Clone the Repository and Run from Command Line:
 
-## ✨ Features
-- Draw digits live with your mouse
-- Automatically trims and processes input images
-- Extracts multiple hand-designed features
-- Aggregates prediction results with voting
-- Works with or without GUI input
+    git clone https://github.com/faisalKab/DigitRecognizer-Java.git
+    cd DigitRecognizer-Java
 
-## 🖥️ How to Run
+Then make sure you're in the correct directory where the project was cloned.  
+You can run the program using:
 
-1. Open the project in any Java IDE (Eclipse, IntelliJ, etc.)
-2. Run `DigitRecognizerUI.java`
-3. Draw a digit and click **Predict**
-4. The predicted result will appear above the canvas
+    java -cp out ui.DigitRecognizerUI
 
-## 📁 Folder Structure
+Option 2: Open in Eclipse (Recommended)
 
-- `src/HandWritten` — Image processing and reduction logic
-- `src/Predictions` — Voting and prediction engine
-- `src/ui` — GUI interface
-- `src/Tests` — Optional test classes
-- `data/` — (Optional) Sample training image directory
-
-## 🔧 Built With
-- Java SE
-- AWT/Swing for UI
-- No external dependencies or ML libraries
-
-## 🤖 Why This Project?
-This was built as a demonstration of AI running entirely on logic-based heuristics. It mimics digit classification similar to MNIST, but using optimized hardware-friendly techniques. Future versions may deploy this model on an FPGA board.
+    Open Eclipse  
+    Go to File > Open Projects from File System  
+    Select the cloned folder  
+    Make sure Eclipse is set to Java 17+  
+    Expand the src folder and navigate to the ui package  
+    Right-click DigitRecognizerUI.java  
+    Select Run As > Java Application
