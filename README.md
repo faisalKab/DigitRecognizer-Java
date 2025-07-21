@@ -19,3 +19,11 @@ Option 2: Open in Eclipse (Recommended)
     Expand the src folder and navigate to the ui package  
     Right-click DigitRecognizerUI.java  
     Select Run As > Java Application
+
+Notice: will not work with intellij
+
+---
+
+🔍 **Full Project Walkthrough:**  
+
+https://faisalkabir.com/ai-hardware
