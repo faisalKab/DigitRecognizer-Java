@@ -26,4 +26,4 @@ Notice: will not work with intellij
 
 🔍 **Full Project Walkthrough:**  
 
-https://faisalkabir.com/ai-hardware
+faisalkabir.com/ai-hardware
