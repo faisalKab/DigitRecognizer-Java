@@ -1,6 +1,6 @@
 # How to Run:
 
-Option 1: Clone the Repository and Run from Command Line:
+## Option 1: Clone the Repository and Run from Command Line:
 
     git clone https://github.com/faisalKab/DigitRecognizer-Java.git
     cd DigitRecognizer-Java
@@ -10,7 +10,7 @@ You can run the program using:
 
     java -cp out ui.DigitRecognizerUI
 
-Option 2: Open in Eclipse (Recommended)
+## Option 2: Open in Eclipse (Recommended)
 
     Open Eclipse  
     Go to File > Open Projects from File System  
@@ -24,6 +24,6 @@ Notice: will not work with intellij
 
 ---
 
-🔍 **Full Project Walkthrough:**  
+## 🔍 **Full Project Walkthrough:**  
 
 [faisalkabir.com/ai-hardware](https://www.faisalkabir.com/ai-hardware)
